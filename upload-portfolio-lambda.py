@@ -3,7 +3,7 @@ import zipfile
 import boto3
 import mimetypes
 
-def handler(events, context):
+def handler(event, context):
     # To notify of successfull deploy
     sns = boto3.resource('sns')
     topic = sns.Topic('arn:aws:sns:us-east-1:737274848372:deployPortfolioTopic')
@@ -13,11 +13,11 @@ def handler(events, context):
         'objectKey': 'portfoliobuild.zip'
     }
 
+    # check if we received param through CodePipeline invocation
+    job = event.get('CodePipeline.job')
+
     try:
         # To download from build bucket and unzip into portfolio bucket
-
-        # check if we received param through CodePipeline invocation
-        job = event.get('CodePipeline.job')
 
         if job:
             for artifact in job['data']['inputArtifacts']:

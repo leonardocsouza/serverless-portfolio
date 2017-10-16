@@ -12,7 +12,7 @@ configure({ adapter: new Adapter() });
 
 const myWork = [
   {
-    'title': 'Work Example',
+    'title': 'Work Example Test',
     'image': {
       'desc': 'example screenshot of a project involving code',
       'src': 'images/example1.png',
@@ -34,18 +34,28 @@ describe("ExampleWork component", () => {
   // shallow - renders this component without any of its subcomponents
   let component = shallow(<ExampleWork work={myWork} />);
 
-  it("Should be a 'section' element", () => {
+  it("Should be a 'span' element", () => {
     //console.log(component.debug());
-    expect(component.type()).toEqual('section');
+    expect(component.type()).toEqual('span');
   });
 
   it("Should contain as many childrens as there are work examples", () => {
     expect(component.find('ExampleWorkBubble').length).toEqual(myWork.length);
   });
+
+  it("Should allow modal to open and close", () => {
+    // instance() is provided by enzyme, which gives us access to the component's methods
+    component.instance().openModal();
+    expect(component.instance().state.modalOpen).toBe(true);
+    component.instance().closeModal();
+    expect(component.instance().state.modalOpen).toBe(false);
+  });
 });
 
 describe("ExampleWorkBubble component", () => {
-  let component = shallow(<ExampleWorkBubble example={myWork[1]} />);
+  let mockOpenModalFn = jest.fn();
+  let component = shallow(<ExampleWorkBubble example={myWork[1]}
+    openModal={mockOpenModalFn}/>);
 
   let images = component.find('img');
 
@@ -55,5 +65,10 @@ describe("ExampleWorkBubble component", () => {
 
   it("Should have the image src set correctly", () => {
     expect(images.getElement().props.src).toEqual(myWork[1].image.src);
+  });
+
+  it("Should call the openModal handler when clicked", () => {
+    component.find('.section__exampleWrapper').simulate('click');
+    expect(mockOpenModalFn).toHaveBeenCalled();
   });
 });
